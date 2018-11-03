@@ -10,7 +10,7 @@
     tools:context=".MainActivity">
 
     <ListView
-        android:id="@+id/lista"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"></ListView>
@@ -18,14 +18,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/floatingActionButton2"
+            android:id="@+id/buttonAddContacto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_gravity="right"
             android:clickable="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
             app:srcCompat="@android:drawable/ic_input_add" />
     </LinearLayout>
 

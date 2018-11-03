@@ -30,7 +30,7 @@ public class Database extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insertarContacto(String nombre, String direccion, String movil, String email) {
+    public void insertContacto(String nombre, String direccion, String movil, String email) {
         SQLiteDatabase db = getWritableDatabase();
 
         if (db != null) {
@@ -45,7 +45,7 @@ public class Database extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void modificarContacto(int id, String nombre, String direccion, String movil, String email) {
+    public void updateContacto(int id, String nombre, String direccion, String movil, String email) {
         SQLiteDatabase db = getWritableDatabase();
 
         if (db != null) {
@@ -60,7 +60,7 @@ public class Database extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void borrarContacto(int id) {
+    public void deleteContacto(int id) {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
             db.delete("contactos", "_id" + id, null);
@@ -68,10 +68,10 @@ public class Database extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Contacto recuperarContacto(int id) {
+    public Contacto queryrContacto(int id) {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"_id", "nombre", "direccion", "movil", "email"};
-        Cursor c = db.query("notas", valores_recuperar, "_id=" + id, null, null, null, null, null);
+        Cursor c = db.query("contactos", valores_recuperar, "_id=" + id, null, null, null, null, null);
         if (c != null) {
             c.moveToFirst();
         }
@@ -81,20 +81,20 @@ public class Database extends SQLiteOpenHelper {
         return contacto;
     }
 
-    public Cursor recuperarContactosCursor() {
+    public Cursor queryContactosCursor() {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"_id","nombre", "direccion", "movil", "email"};
 
-        Cursor c = db.query("notas", valores_recuperar, null, null, null, null, null, null);
+        Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
         return c;
     }
 
-    public int numerodeFilas(){
-        int dato= (int) DatabaseUtils.queryNumEntries(this.getWritableDatabase(), "notas");
+    public int numberOfRows(){
+        int dato= (int) DatabaseUtils.queryNumEntries(this.getWritableDatabase(), "contactos");
         return dato;
     }
 
-    public int [] recuperaIds(){
+    public int [] queryIds(){
         int [] datosId;
         int i;
         SQLiteDatabase db = getReadableDatabase();
