@@ -9,6 +9,7 @@ import android.view.View;
 
 public class MainActivity extends ListActivity {
 
+    public static final int CODE_ADD = 12;
     private Database dataBase;
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
@@ -42,6 +43,19 @@ public class MainActivity extends ListActivity {
 
     public void createContacto(View v) {
         Intent i = new Intent(this, CreateContacto.class);
-        startActivityForResult(i, 12);
+        startActivityForResult(i, CODE_ADD);
+    }
+
+    protected void onActivityResult(int result, int code, Intent data) {
+        if (code == RESULT_OK) {
+            if (result == CODE_ADD) {
+                String nombre = data.getExtras().getString("Nombre");
+                String direccion = data.getExtras().getString("Direccion");
+                String movil = data.getExtras().getString("Movil");
+                String email = data.getExtras().getString("Email");
+                dataBase.insertContacto(nombre, direccion, movil, email);
+                fillList();
+            }
+        }
     }
 }

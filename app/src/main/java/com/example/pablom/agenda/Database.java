@@ -11,7 +11,8 @@ public class Database extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "AgendaDB.db";
-    private static final String CONTACTOS_TABLE = "CREATE TABLE contactos " +
+    private static final String CONTACTOS_TABLE = "contactos";
+    private static final String CONTACTOS_CREATE_TABLE = "CREATE TABLE contactos " +
             "(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, nombre VARCHAR(30) NOT NULL, " +
             "direccion VARCHAR(50), movil VARCHAR(9), email VARCHAR(40))";
 
@@ -21,12 +22,12 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CONTACTOS_TABLE);
+        db.execSQL(CONTACTOS_CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(new StringBuilder().append("DROP TABLE IF EXISTS ").append(CONTACTOS_TABLE).toString());
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTOS_TABLE );
         onCreate(db);
     }
 

@@ -2,4 +2,12 @@
     <string name="app_name">Agenda</string>
     <string name="name">Nombre</string>
     <string name="inputName">Introduce un nombre</string>
+    <string name="address">Dirección</string>
+    <string name="inputAddress">Introduce una dirección</string>
+    <string name="mobile">Móvil</string>
+    <string name="inputMobile">Introduce un móvil</string>
+    <string name="email">Email</string>
+    <string name="inputEmail">Introduce un email</string>
+    <string name="cancel">Cancelar</string>
+    <string name="Add">Guardar</string>
 </resources>
