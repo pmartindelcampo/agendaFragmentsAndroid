@@ -64,7 +64,7 @@ public class Database extends SQLiteOpenHelper {
     public void deleteContacto(int id) {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
-            db.delete("contactos", "_id" + id, null);
+            db.delete("contactos", "_id=" + id, null);
         }
         db.close();
     }

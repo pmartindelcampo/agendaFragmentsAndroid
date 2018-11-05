@@ -10,4 +10,6 @@
     <string name="inputEmail">Introduce un email</string>
     <string name="cancel">Cancelar</string>
     <string name="Add">Guardar</string>
+    <string name="delete_contact">Eliminar contacto</string>
+    <string name="update_contact">Modificar contacto</string>
 </resources>

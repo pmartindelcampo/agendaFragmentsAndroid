@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 public class MainActivity extends ListActivity {
 
@@ -13,13 +17,15 @@ public class MainActivity extends ListActivity {
     private Database dataBase;
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
-    private int numRows;
+    private ListView lvList;
+    private int numRows, idCont;
     private int[] idList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        lvList = findViewById(android.R.id.list);
         addContacto = findViewById(R.id.buttonAddContacto);
         addContacto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +62,30 @@ public class MainActivity extends ListActivity {
                 dataBase.insertContacto(nombre, direccion, movil, email);
                 fillList();
             }
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == getListView().getId()) {
+            getMenuInflater().inflate(R.menu.contextual_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemId = item.getItemId();
+        switch (menuItemId) {
+            case R.id.buttonDelete:
+                idCont = idList[info.position];
+                dataBase.deleteContacto(idCont);
+                fillList();
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 }
