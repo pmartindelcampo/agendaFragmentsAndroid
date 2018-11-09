@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".CreateContacto">
+    tools:context=".UpdateContacto">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -145,30 +145,30 @@
 
         </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true">
 
-                <Button
-                    android:id="@+id/buttonCancelContacto"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/cancel"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:textColor="@color/colorPrimary" />
+            <Button
+                android:id="@+id/buttonCancelContacto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/cancel"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:textColor="@color/colorPrimary" />
 
-                <Button
-                    android:id="@+id/buttonAddContacto"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:textColor="@android:color/white"
-                    android:text="@string/add_button" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/buttonUpdateContacto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:text="@string/update_button" />
+        </LinearLayout>
 
     </RelativeLayout>
 

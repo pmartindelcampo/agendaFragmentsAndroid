@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CreateContacto" />
+        <activity android:name=".UpdateContacto" />
+        <activity android:name=".ShowContacto" />
     </application>
 
 </manifest>

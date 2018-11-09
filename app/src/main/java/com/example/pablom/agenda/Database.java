@@ -69,7 +69,7 @@ public class Database extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Contacto queryrContacto(int id) {
+    public Contacto queryContacto(int id) {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"_id", "nombre", "direccion", "movil", "email"};
         Cursor c = db.query("contactos", valores_recuperar, "_id=" + id, null, null, null, null, null);

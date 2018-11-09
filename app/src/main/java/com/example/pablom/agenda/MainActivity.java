@@ -3,7 +3,6 @@ package com.example.pablom.agenda;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 public class MainActivity extends ListActivity {
 
     public static final int CODE_ADD = 12;
+    public static final int CODE_UPDATE = 13;
     private Database dataBase;
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
@@ -32,6 +32,12 @@ public class MainActivity extends ListActivity {
             @Override
             public void onClick(View v) {
                 createContacto(v);
+            }
+        });
+        lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                mostrarContacto(idList[i]);
             }
         });
         dataBase = new Database(getApplicationContext());
@@ -53,6 +59,28 @@ public class MainActivity extends ListActivity {
         startActivityForResult(i, CODE_ADD);
     }
 
+    public void updateContacto(View v) {
+        Intent i = new Intent(this, UpdateContacto.class);
+        Contacto contacto = dataBase.queryContacto(idCont);
+        i.putExtra("id", idCont);
+        i.putExtra("name", contacto.getNombre());
+        i.putExtra("address", contacto.getDireccion());
+        i.putExtra("phone", contacto.getMovil());
+        i.putExtra("email", contacto.getEmail());
+        startActivityForResult(i, CODE_UPDATE);
+    }
+
+    public void mostrarContacto(int id) {
+        Intent i = new Intent(this, ShowContacto.class);
+        Contacto contacto = dataBase.queryContacto(id);
+        i.putExtra("id", id);
+        i.putExtra("name", contacto.getNombre());
+        i.putExtra("address", contacto.getDireccion());
+        i.putExtra("phone", contacto.getMovil());
+        i.putExtra("email", contacto.getEmail());
+        startActivity(i);
+    }
+
     protected void onActivityResult(int result, int code, Intent data) {
         if (code == RESULT_OK) {
             if (result == CODE_ADD) {
@@ -62,6 +90,15 @@ public class MainActivity extends ListActivity {
                 String email = data.getExtras().getString("Email");
                 dataBase.insertContacto(nombre, direccion, movil, email);
                 Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
+                fillList();
+            } else if (result == CODE_UPDATE) {
+                int id = data.getExtras().getInt("id");
+                String nombre = data.getExtras().getString("Nombre");
+                String direccion = data.getExtras().getString("Direccion");
+                String movil = data.getExtras().getString("Movil");
+                String email = data.getExtras().getString("Email");
+                dataBase.updateContacto(id, nombre, direccion, movil, email);
+                Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
                 fillList();
             }
         }
@@ -84,6 +121,12 @@ public class MainActivity extends ListActivity {
                 idCont = idList[info.position];
                 dataBase.deleteContacto(idCont);
                 fillList();
+                return true;
+
+            case R.id.buttonUpdate:
+                System.out.print("update");
+                idCont = idList[info.position];
+                updateContacto(getListView());
                 return true;
 
             default:

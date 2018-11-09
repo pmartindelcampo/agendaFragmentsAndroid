@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".CreateContacto">
+    tools:context=".ShowContacto">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -22,6 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -30,31 +31,43 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_cliente" />
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/tilName"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                app:counterEnabled="true"
-                app:counterMaxLength="30"
-                app:errorEnabled="true">
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
 
-                <EditText
-                    android:id="@+id/etName"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/name"
-                    android:inputType="text"
-                    android:maxLines="1" />
+                    android:text="@string/name"
+                    android:textSize="18sp" />
 
-            </android.support.design.widget.TextInputLayout>
+                <TextView
+                    android:id="@+id/tvNombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/line1"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:paddingTop="5dip"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/linName"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         <LinearLayout
             android:id="@+id/linAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/linName"
             android:orientation="horizontal">
 
@@ -64,29 +77,43 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_correo" />
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/tilAddress"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                app:counterEnabled="true"
-                app:counterMaxLength="50">
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
 
-                <EditText
-                    android:id="@+id/etAddress"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/address"
-                    android:inputType="text"
-                    android:maxLines="1" />
-            </android.support.design.widget.TextInputLayout>
+                    android:text="@string/address"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvDireccion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/line2"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:paddingTop="5dip"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/linAddress"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         <LinearLayout
             android:id="@+id/linMobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/linAddress"
             android:orientation="horizontal">
 
@@ -96,28 +123,42 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_telefono" />
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/tilMobile"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                app:errorEnabled="true">
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
 
-                <EditText
-                    android:id="@+id/etMobile"
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/mobile"
-                    android:inputType="phone"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
+                    android:text="@string/mobile"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvMovil"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp" />
+            </LinearLayout>
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/line3"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:paddingTop="5dip"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/linMobile"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
 
         <LinearLayout
             android:id="@+id/linEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/linMobile"
             android:orientation="horizontal">
 
@@ -127,48 +168,26 @@
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_correo" />
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/tilEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                app:errorEnabled="true">
-
-                <EditText
-                    android:id="@+id/etEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-
-        </LinearLayout>
-
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
 
-                <Button
-                    android:id="@+id/buttonCancelContacto"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/cancel"
-                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:textColor="@color/colorPrimary" />
+                    android:text="@string/email"
+                    android:textSize="18sp" />
 
-                <Button
-                    android:id="@+id/buttonAddContacto"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:textColor="@android:color/white"
-                    android:text="@string/add_button" />
+                    android:textSize="18sp" />
             </LinearLayout>
+
+        </LinearLayout>
 
     </RelativeLayout>
 
