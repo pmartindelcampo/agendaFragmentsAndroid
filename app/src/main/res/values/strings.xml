@@ -12,4 +12,10 @@
     <string name="Add">Guardar</string>
     <string name="delete_contact">Eliminar contacto</string>
     <string name="update_contact">Modificar contacto</string>
+    <string name="call_contact">Llamar</string>
+    <string name="error_name">Nombre no válido</string>
+    <string name="error_email">Email no válido</string>
+    <string name="error_phone">Móvil no válido</string>
+    <string name="error_address">Direccción no válida</string>
+    <string name="add_success">Se guarda el registro</string>
 </resources>

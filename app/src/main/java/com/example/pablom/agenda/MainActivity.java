@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends ListActivity {
 
@@ -60,6 +61,7 @@ public class MainActivity extends ListActivity {
                 String movil = data.getExtras().getString("Movil");
                 String email = data.getExtras().getString("Email");
                 dataBase.insertContacto(nombre, direccion, movil, email);
+                Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
                 fillList();
             }
         }

@@ -1,88 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:padding="10dp"
-    android:layout_margin="10dp"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".CreateContacto">
 
-    <android.support.design.widget.TextInputLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputAddNombre"
-        android:hint="@string/name"
-        style="@style/inputStyle">
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:padding="15dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <EditText
+
+        <LinearLayout
+            android:id="@+id/linName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etAddNombre"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputAddDireccion"
-        android:hint="@string/address"
-        style="@style/inputStyle">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_cliente" />
 
-        <EditText
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="30"
+                app:errorEnabled="true">
+
+                <EditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/name"
+                    android:inputType="text"
+                    android:maxLines="1" />
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etAddDireccion"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_below="@+id/linName"
+            android:orientation="horizontal">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputAddMovil"
-        android:hint="@string/mobile"
-        style="@style/inputStyle">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_correo" />
 
-        <EditText
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:counterEnabled="true"
+                app:counterMaxLength="50">
+
+                <EditText
+                    android:id="@+id/etAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/address"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linMobile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etAddMovil"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_below="@+id/linAddress"
+            android:orientation="horizontal">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputAddEmail"
-        android:hint="@string/email"
-        style="@style/inputStyle">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_telefono" />
 
-        <EditText
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilMobile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:errorEnabled="true">
+
+                <EditText
+                    android:id="@+id/etMobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/mobile"
+                    android:inputType="phone"
+                    android:maxLines="1"/>
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/etAddEmail"
-            android:inputType="text" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_below="@+id/linMobile"
+            android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_correo" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonCancelContacto"
-            android:layout_weight="1"
-            android:layout_marginRight="5dp"
-            android:text="@string/cancel"/>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:errorEnabled="true">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonAddContacto"
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:text="@string/Add"/>
-    </LinearLayout>
-</LinearLayout>
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"/>
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:orientation="horizontal"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/buttonCancelContacto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/cancel"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                    android:textColor="@color/colorPrimary" />
+
+                <Button
+                    android:id="@+id/buttonAddContacto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:text="@string/Add" />
+            </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>

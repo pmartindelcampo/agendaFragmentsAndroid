@@ -7,4 +7,8 @@
 
     <item android:id="@+id/buttonUpdate"
         android:title="@string/update_contact" />
+
+    <item
+        android:id="@+id/buttonCall"
+        android:title="@string/call_contact" />
 </menu>
