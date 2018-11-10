@@ -2,6 +2,7 @@ package com.example.pablom.agenda;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -81,6 +82,13 @@ public class MainActivity extends ListActivity {
         startActivity(i);
     }
 
+    public void callContacto(int id) {
+        Intent i = new Intent(Intent.ACTION_DIAL);
+        Contacto contacto = dataBase.queryContacto(id);
+        i.setData(Uri.parse("tel:"+contacto.getMovil()));
+        startActivity(i);
+    }
+
     protected void onActivityResult(int result, int code, Intent data) {
         if (code == RESULT_OK) {
             if (result == CODE_ADD) {
@@ -124,9 +132,13 @@ public class MainActivity extends ListActivity {
                 return true;
 
             case R.id.buttonUpdate:
-                System.out.print("update");
                 idCont = idList[info.position];
                 updateContacto(getListView());
+                return true;
+
+            case R.id.buttonCall:
+                idCont = idList[info.position];
+                callContacto(idCont);
                 return true;
 
             default:
