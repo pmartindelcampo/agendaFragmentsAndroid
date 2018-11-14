@@ -2,35 +2,68 @@ package com.example.pablom.agenda;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-public class MyAdapter extends CursorAdapter {
+import java.util.ArrayList;
 
-    private LayoutInflater inflater;
-    private TextView nombre, movil;
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolder> implements View.OnClickListener {
 
-    public MyAdapter(Context context, Cursor c) {
-        super(context, c, false);
+    private View.OnClickListener listener;
+    private ArrayList<Contacto> datos;
+
+    public MyAdapter(ArrayList<Contacto> datos) {
+        this.datos = datos;
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.elementolista, parent, false);
-        return view;
+    public ContactosViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.elementolista, parent,false);
+        ContactosViewHolder cvh = new ContactosViewHolder(itemView);
+        itemView.setOnClickListener(this);
+        return cvh;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        nombre = view.findViewById(R.id.tvNombre);
-        movil = view.findViewById(R.id.tvMovil);
-        nombre.setText(cursor.getString(1));
-        movil.setText(cursor.getString(3));
+    public void onBindViewHolder(ContactosViewHolder holder, int position) {
+        Contacto item = datos.get(position);
+        holder.bindContactos(item);
     }
 
+    @Override
+    public int getItemCount() {
+        return datos.size();
+    }
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (listener != null) {
+            listener.onClick(view);
+        }
+    }
+
+    public static class ContactosViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView nombre, movil;
+
+        public ContactosViewHolder(View v) {
+            super(v);
+            nombre = (TextView) v.findViewById(R.id.tvNombre);
+            movil = (TextView) v.findViewById(R.id.tvMovil);
+        }
+
+        public void bindContactos(Contacto c) {
+            nombre.setText(c.getNombre());
+            movil.setText(c.getMovil());
+        }
+    }
 
 }

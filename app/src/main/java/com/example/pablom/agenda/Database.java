@@ -7,6 +7,8 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 public class Database extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
@@ -88,6 +90,28 @@ public class Database extends SQLiteOpenHelper {
 
         Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
         return c;
+    }
+
+    public ArrayList<Contacto> queryContactos() {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] valores_recuperar = {"_id","nombre", "direccion", "movil", "email"};
+        ArrayList<Contacto> datosContactos = new ArrayList<>();
+
+        Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
+
+        int i;
+        if (c.getCount() > 0) {
+            i = 0;
+            Contacto contacto;
+            c.moveToFirst();
+            while (!c.isAfterLast()) {
+                datosContactos.add(new Contacto(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4)));
+                i++;
+                c.moveToNext();
+            }
+        }
+        c.close();
+        return datosContactos;
     }
 
     public int numberOfRows(){

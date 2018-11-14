@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/layout_toolbar"
@@ -16,37 +23,29 @@
         android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
+        android:layout_alignParentTop="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
     </android.support.v7.widget.Toolbar>
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="5" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_margin="5dp"
-        android:orientation="vertical">
-
-        <Space
+        <android.support.v7.widget.RecyclerView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/rvList"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:padding="3dp"
+            android:layout_below="@id/layout_toolbar"
+            android:scrollbars="vertical" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/buttonAddContacto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end"
+            android:layout_alignParentEnd="true"
             android:clickable="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
             app:srcCompat="@android:drawable/ic_input_add" />
-    </LinearLayout>
 
-</LinearLayout>
+    </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

@@ -1,11 +1,12 @@
 package com.example.pablom.agenda;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -14,6 +15,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -24,16 +27,34 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
     private ListView lvList;
+    private RecyclerView rvList;
+    private ArrayList<Contacto> datos;
     private Toolbar toolbar;
-    private int numRows, idCont;
+    private int numRows, pos;
     private int[] idList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dataBase = new Database(getApplicationContext());
+        fillIdList();
 
-        lvList = findViewById(android.R.id.list);
+        rvList = (RecyclerView) findViewById(R.id.rvList);
+        datos = dataBase.queryContactos();
+        adapter = new MyAdapter(datos);
+        rvList.setAdapter(adapter);
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pos = rvList.getChildAdapterPosition(view);
+                mostrarContacto(idList[pos]);
+            }
+        });
+        rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rvList.addItemDecoration(new ItemDecorationSeparador(this,ItemDecorationSeparador.VERTICAL_LIST));
+        
+        //lvList = findViewById(android.R.id.list);
         addContacto = findViewById(R.id.buttonAddContacto);
         addContacto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,27 +62,20 @@ public class MainActivity extends AppCompatActivity {
                 createContacto();
             }
         });
-        lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                mostrarContacto(idList[i]);
-            }
-        });
         toolbar = findViewById(R.id.layout_toolbar);
         setSupportActionBar(toolbar);
-        dataBase = new Database(getApplicationContext());
-        fillList();
-        registerForContextMenu(lvList);
+        //fillList();
+        registerForContextMenu(rvList);
     }
 
-    public void fillList() {
+    public void fillIdList() {
         numRows = dataBase.numberOfRows();
         if (numRows > 0) {
             idList = dataBase.queryIds();
         }
-        adapter = new MyAdapter(this, dataBase.queryContactosCursor());
+        //adapter = new MyAdapter(this, dataBase.queryContactosCursor());
         //setListAdapter(adapter);
-        lvList.setAdapter(adapter);
+        //lvList.setAdapter(adapter);
     }
 
     public void createContacto() {
@@ -71,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateContacto(View v) {
         Intent i = new Intent(this, UpdateContacto.class);
-        Contacto contacto = dataBase.queryContacto(idCont);
-        i.putExtra("id", idCont);
+        Contacto contacto = dataBase.queryContacto(pos);
+        i.putExtra("id", pos);
         i.putExtra("name", contacto.getNombre());
         i.putExtra("address", contacto.getDireccion());
         i.putExtra("phone", contacto.getMovil());
@@ -107,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 String email = data.getExtras().getString("Email");
                 dataBase.insertContacto(nombre, direccion, movil, email);
                 Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
-                fillList();
+                //fillList();
             } else if (result == CODE_UPDATE) {
                 int id = data.getExtras().getInt("id");
                 String nombre = data.getExtras().getString("Nombre");
@@ -116,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 String email = data.getExtras().getString("Email");
                 dataBase.updateContacto(id, nombre, direccion, movil, email);
                 Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
-                fillList();
+                //fillList();
             }
         }
     }
@@ -157,19 +171,19 @@ public class MainActivity extends AppCompatActivity {
         int menuItemId = item.getItemId();
         switch (menuItemId) {
             case R.id.buttonDelete:
-                idCont = idList[info.position];
-                dataBase.deleteContacto(idCont);
-                fillList();
+                pos = idList[info.position];
+                dataBase.deleteContacto(pos);
+                //fillList();
                 return true;
 
             case R.id.buttonUpdate:
-                idCont = idList[info.position];
+                pos = idList[info.position];
                 updateContacto(lvList);
                 return true;
 
             case R.id.buttonCall:
-                idCont = idList[info.position];
-                callContacto(idCont);
+                pos = idList[info.position];
+                callContacto(pos);
                 return true;
 
             default:
