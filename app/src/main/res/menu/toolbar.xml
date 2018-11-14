@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/buttonAddContacto"
+        android:title="@string/menu_add" />
+
+    <item
+        android:id="@+id/buttonExport"
+        android:title="@string/export_file" />
+
+    <item
+        android:id="@+id/buttonImport"
+        android:title="@string/import_file" />
+
+</menu>

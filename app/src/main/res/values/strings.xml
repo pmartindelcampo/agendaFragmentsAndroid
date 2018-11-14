@@ -21,4 +21,7 @@
     <string name="update_success">Se ha modificado el registro</string>
     <string name="update_button">Modificar</string>
     <string name="button_call">Llamar</string>
+    <string name="export_file">Exportar a fichero</string>
+    <string name="import_file">Importar desde fichero</string>
+    <string name="menu_add">Añadir contacto</string>
 </resources>

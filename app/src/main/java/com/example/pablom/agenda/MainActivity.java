@@ -5,14 +5,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+
+public class MainActivity extends AppCompatActivity {
 
     public static final int CODE_ADD = 12;
     public static final int CODE_UPDATE = 13;
@@ -20,6 +24,7 @@ public class MainActivity extends ListActivity {
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
     private ListView lvList;
+    private Toolbar toolbar;
     private int numRows, idCont;
     private int[] idList;
 
@@ -27,12 +32,13 @@ public class MainActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         lvList = findViewById(android.R.id.list);
         addContacto = findViewById(R.id.buttonAddContacto);
         addContacto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createContacto(v);
+                createContacto();
             }
         });
         lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -41,9 +47,11 @@ public class MainActivity extends ListActivity {
                 mostrarContacto(idList[i]);
             }
         });
+        toolbar = findViewById(R.id.layout_toolbar);
+        setSupportActionBar(toolbar);
         dataBase = new Database(getApplicationContext());
         fillList();
-        registerForContextMenu(getListView());
+        registerForContextMenu(lvList);
     }
 
     public void fillList() {
@@ -52,10 +60,11 @@ public class MainActivity extends ListActivity {
             idList = dataBase.queryIds();
         }
         adapter = new MyAdapter(this, dataBase.queryContactosCursor());
-        setListAdapter(adapter);
+        //setListAdapter(adapter);
+        lvList.setAdapter(adapter);
     }
 
-    public void createContacto(View v) {
+    public void createContacto() {
         Intent i = new Intent(this, CreateContacto.class);
         startActivityForResult(i, CODE_ADD);
     }
@@ -113,9 +122,31 @@ public class MainActivity extends ListActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.buttonAddContacto:
+                createContacto();
+                break;
+
+            case R.id.buttonExport:
+                break;
+
+            case R.id.buttonImport:
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == getListView().getId()) {
+        if (v.getId() == lvList.getId()) {
             getMenuInflater().inflate(R.menu.contextual_menu, menu);
         }
     }
@@ -133,7 +164,7 @@ public class MainActivity extends ListActivity {
 
             case R.id.buttonUpdate:
                 idCont = idList[info.position];
-                updateContacto(getListView());
+                updateContacto(lvList);
                 return true;
 
             case R.id.buttonCall:
