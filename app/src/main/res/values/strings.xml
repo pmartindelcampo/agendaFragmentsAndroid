@@ -24,4 +24,5 @@
     <string name="export_file">Exportar a fichero</string>
     <string name="import_file">Importar desde fichero</string>
     <string name="menu_add">Añadir contacto</string>
+    <string name="details_contact">Detalles de contacto</string>
 </resources>

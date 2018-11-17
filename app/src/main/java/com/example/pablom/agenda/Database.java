@@ -7,6 +7,9 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Database extends SQLiteOpenHelper {
@@ -93,16 +96,13 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public ArrayList<Contacto> queryContactos() {
-        SQLiteDatabase db = getReadableDatabase();
-        String[] valores_recuperar = {"_id","nombre", "direccion", "movil", "email"};
         ArrayList<Contacto> datosContactos = new ArrayList<>();
 
-        Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
+        Cursor c = queryContactosCursor();
 
         int i;
         if (c.getCount() > 0) {
             i = 0;
-            Contacto contacto;
             c.moveToFirst();
             while (!c.isAfterLast()) {
                 datosContactos.add(new Contacto(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4)));
@@ -112,6 +112,15 @@ public class Database extends SQLiteOpenHelper {
         }
         c.close();
         return datosContactos;
+    }
+
+    public Contacto queryLastElement() {
+        Contacto contacto;
+        Cursor c = queryContactosCursor();
+
+        c.moveToLast();
+        contacto = new Contacto(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4));
+        return contacto;
     }
 
     public int numberOfRows(){
@@ -137,5 +146,34 @@ public class Database extends SQLiteOpenHelper {
         else datosId= new int [0];
         cursor.close();
         return datosId;
+    }
+
+    public void exportToJson() {
+        JSONArray json = new JSONArray();
+        Cursor c = queryContactosCursor();
+
+        JSONObject row;
+        c.moveToFirst();
+        while (!c.isAfterLast()) {
+            row = new JSONObject();
+
+            for (int i = 0; i < c.getColumnCount(); i++) {
+                if (c.getColumnName(i) != null) {
+                    try {
+                        if (c.getString(i) != null) {
+                            row.put(c.getColumnName(i), c.getString(i));
+                        } else {
+                            row.put(c.getColumnName(i), "");
+                        }
+                    } catch (Exception e) {
+                        System.out.printf("TAG_NAME", e.getMessage());
+                    }
+                }
+            }
+            json.put(row);
+            c.moveToNext();
+        }
+        c.close();
+        System.out.print(json.toString());
     }
 }

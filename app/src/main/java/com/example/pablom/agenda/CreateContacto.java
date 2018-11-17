@@ -166,7 +166,7 @@ public class CreateContacto extends AppCompatActivity {
 
     private boolean isValidName(String name) {
         Pattern patron = Pattern.compile("^[a-zA-Z ]+$");
-        if (!patron.matcher(name).matches() || name.length() > 30) {
+        if (!patron.matcher(name).matches() || name.length() > 50) {
             tilNombre.setError(getString(R.string.error_name));
             return false;
         } else {

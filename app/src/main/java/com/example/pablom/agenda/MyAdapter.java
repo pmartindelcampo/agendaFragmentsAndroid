@@ -11,9 +11,10 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolder> implements View.OnClickListener {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
     private View.OnClickListener listener;
+    private View.OnLongClickListener longListener;
     private ArrayList<Contacto> datos;
 
     public MyAdapter(ArrayList<Contacto> datos) {
@@ -25,6 +26,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.elementolista, parent,false);
         ContactosViewHolder cvh = new ContactosViewHolder(itemView);
         itemView.setOnClickListener(this);
+        itemView.setOnLongClickListener(this);
         return cvh;
     }
 
@@ -50,19 +52,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
         }
     }
 
+    public void setOnLongClickListener(View.OnLongClickListener longListener) {
+        this.longListener = longListener;
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        if (longListener != null) {
+            longListener.onLongClick(view);
+        }
+        return true;
+    }
+
     public static class ContactosViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView nombre, movil;
+        private TextView nombre, movil, avatar_text;
 
         public ContactosViewHolder(View v) {
             super(v);
             nombre = (TextView) v.findViewById(R.id.tvNombre);
             movil = (TextView) v.findViewById(R.id.tvMovil);
+            avatar_text = (TextView) v.findViewById(R.id.avatar_text);
         }
 
         public void bindContactos(Contacto c) {
             nombre.setText(c.getNombre());
             movil.setText(c.getMovil());
+            avatar_text.setText(String.valueOf(c.getNombre().charAt(0)).toUpperCase());
         }
     }
 

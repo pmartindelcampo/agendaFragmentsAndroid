@@ -24,8 +24,8 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:layout_alignParentTop="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+        android:theme="@style/Theme.Design.Light.NoActionBar"
+        app:popupTheme="@style/Theme.Design.Light.NoActionBar" >
     </android.support.v7.widget.Toolbar>
 
         <android.support.v7.widget.RecyclerView
@@ -41,10 +41,13 @@
             android:id="@+id/buttonAddContacto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="end"
             android:layout_alignParentEnd="true"
             android:clickable="true"
+            android:focusable="true"
+            android:tint="@android:color/white"
             app:srcCompat="@android:drawable/ic_input_add" />
 
     </RelativeLayout>

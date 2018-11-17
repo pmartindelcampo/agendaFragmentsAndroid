@@ -12,18 +12,32 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:padding="15dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/layout_toolbar"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:title="@string/details_contact"
+            android:layout_alignParentTop="true"
+            android:theme="@style/Theme.Design.Light.NoActionBar"
+            app:popupTheme="@style/Theme.Design.Light.NoActionBar" >
+        </android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:id="@+id/linName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/layout_toolbar"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="@style/formItems">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -60,7 +74,9 @@
             android:layout_below="@+id/linName"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp" />
 
         <LinearLayout
             android:id="@+id/linAddress"
@@ -69,7 +85,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/linName"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="@style/formItems">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -106,7 +123,9 @@
             android:layout_below="@+id/linAddress"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp" />
 
         <LinearLayout
             android:id="@+id/linMobile"
@@ -115,7 +134,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/linAddress"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="@style/formItems">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -152,7 +172,9 @@
             android:layout_below="@+id/linMobile"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp" />
 
         <LinearLayout
             android:id="@+id/linEmail"
@@ -160,7 +182,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_below="@+id/linMobile"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            style="@style/formItems">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -193,6 +216,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
+            style="@style/formItems"
+            android:layout_marginBottom="15dp"
             android:layout_alignParentBottom="true">
 
             <Button
@@ -200,8 +225,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@android:color/white"
                 android:text="@string/button_call" />
         </LinearLayout>
 
