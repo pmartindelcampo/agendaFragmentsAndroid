@@ -6,10 +6,20 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class Database extends SQLiteOpenHelper {
@@ -80,6 +90,8 @@ public class Database extends SQLiteOpenHelper {
         Cursor c = db.query("contactos", valores_recuperar, "_id=" + id, null, null, null, null, null);
         if (c != null) {
             c.moveToFirst();
+        } else {
+            return null;
         }
         Contacto contacto = new Contacto(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4));
         db.close();
@@ -148,7 +160,7 @@ public class Database extends SQLiteOpenHelper {
         return datosId;
     }
 
-    public void exportToJson() {
+    public void exportToJson(Context context) {
         JSONArray json = new JSONArray();
         Cursor c = queryContactosCursor();
 
@@ -166,7 +178,7 @@ public class Database extends SQLiteOpenHelper {
                             row.put(c.getColumnName(i), "");
                         }
                     } catch (Exception e) {
-                        System.out.printf("TAG_NAME", e.getMessage());
+                        Log.e("JSON", e.getMessage());
                     }
                 }
             }
@@ -174,6 +186,39 @@ public class Database extends SQLiteOpenHelper {
             c.moveToNext();
         }
         c.close();
-        System.out.print(json.toString());
+
+        try {
+            File ruta = Environment.getExternalStorageDirectory();
+            File f = new File(ruta.getAbsolutePath(), "json.CNT");
+            OutputStreamWriter fWrite = new OutputStreamWriter(new FileOutputStream(f));
+            fWrite.write(json.toString());
+            fWrite.close();
+            Toast.makeText(context, "Se ha exportado los datos a SD", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.e("Ficheros", "Error al escribir fichero a SD");
+        }
+    }
+
+    public ArrayList<Contacto> importFromJSON(Context context) {
+        JSONArray json;
+        ArrayList<Contacto> contactos = new ArrayList<>();
+        try {
+            File ruta = Environment.getExternalStorageDirectory();
+            File f = new File(ruta.getAbsolutePath(), "json.CNT");
+            BufferedReader fRead = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            String jsonString = fRead.readLine();
+            json = new JSONArray(jsonString);
+            if (json != null) {
+                for (int i = 0; i < json.length(); i++) {
+                    contactos.add((Contacto) json.get(i));
+                }
+                Toast.makeText(context, "Se ha completado la importación con éxito", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "El fichero está vacío", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e("Ficheros", "Error al leer el fichero");
+        }
+        return contactos;
     }
 }

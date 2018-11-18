@@ -1,9 +1,15 @@
 package com.example.pablom.agenda;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +23,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 
@@ -24,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int CODE_ADD = 12;
     public static final int CODE_UPDATE = 13;
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
     private Database dataBase;
     private MyAdapter adapter;
     private FloatingActionButton addContacto;
@@ -33,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private int numRows, pos;
     private int[] idList;
+    String permiso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,16 +175,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String estado;
         switch(item.getItemId()) {
             case R.id.buttonAddContacto:
                 createContacto();
                 break;
 
             case R.id.buttonExport:
-                dataBase.exportToJson();
+                estado = Environment.getExternalStorageState();
+                permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+                if (estado.equals(Environment.MEDIA_MOUNTED)) {
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                } else {
+                    Toast.makeText(this, "No es posible acceder a la SD", Toast.LENGTH_SHORT).show();
+                }
+                //Toast.makeText(this, "Se ha exportado los datos a la SD", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.buttonImport:
+                estado = Environment.getExternalStorageState();
+                permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+                if (estado.equals(Environment.MEDIA_MOUNTED) || estado.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                } else {
+                    Toast.makeText(this, "No es posible acceder a la SD", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
         return true;
@@ -207,6 +233,59 @@ public class MainActivity extends AppCompatActivity {
 
             default:
                 return super.onContextItemSelected(item);
+        }
+    }
+
+    public void comprobarPermisos(int requestCode) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, permiso)) {
+
+                } else {
+                    requestPermissions(new String[]{permiso}, requestCode);
+                }
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{permiso}, requestCode);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        ArrayList<Contacto> contactos = new ArrayList<>();
+        int id;
+        String nombre, direccion, movil, email;
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE://Manifest.permission.WRITE_EXTERNAL_STORAGE:{
+                // La peticion ha sido cancelada  si el array esta vacio
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    dataBase.exportToJson(this);
+                } else {
+                    Toast.makeText(this, "No se han concedido los permisos necesarios", Toast.LENGTH_LONG).show();
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                }
+                break;
+
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    contactos = dataBase.importFromJSON(this);
+                    for (Contacto c : contactos) {
+                        id = c.getId();
+                        nombre = c.getNombre();
+                        direccion = c.getDireccion();
+                        movil = c.getMovil();
+                        email = c.getEmail();
+                        dataBase.insertContacto(nombre, direccion, movil, email);
+                        datos.add(c);
+                        adapter.notifyItemInserted(datos.size());
+                    }
+                } else {
+                    Toast.makeText(this, "No se han concedido los permisos necesarios", Toast.LENGTH_LONG).show();
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                }
         }
     }
 }
