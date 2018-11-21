@@ -15,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -54,29 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
         rvList = (RecyclerView) findViewById(R.id.rvList);
         datos = dataBase.queryContactos();
-        adapter = new MyAdapter(datos);
+        adapter = new MyAdapter(datos, dataBase);
+        configureAdapter();
 
-        adapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pos = rvList.getChildAdapterPosition(view);
-                mostrarContacto(idList[pos]);
-            }
-        });
-
-        adapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                pos = rvList.getChildAdapterPosition(view);
-                openContextMenu(rvList);
-                return true;
-            }
-        });
-
-        rvList.setAdapter(adapter);
-        rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        //rvList.addItemDecoration(new ItemDecorationSeparador(this,ItemDecorationSeparador.VERTICAL_LIST));
-        rvList.setItemAnimator(new DefaultItemAnimator());
+        ItemTouchHelper.Callback callback = new SwipeItemTouch((ItemTouchAdapter) adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(rvList);
 
         //lvList = findViewById(android.R.id.list);
         addContacto = (FloatingActionButton) findViewById(R.id.buttonAddContacto);
@@ -88,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         });
         toolbar = (Toolbar) findViewById(R.id.layout_toolbar);
         setSupportActionBar(toolbar);
-        registerForContextMenu(rvList);
+        //registerForContextMenu(rvList);
     }
 
     public void fillIdList() {
@@ -106,13 +90,13 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(i, CODE_ADD);
     }
 
-    public void deleteContacto(int id) {
+    /*public void deleteContacto(int id) {
         datos.remove(pos);
         dataBase.deleteContacto(id);
         adapter.notifyItemRemoved(pos);
-    }
+    }*/
 
-    public void updateContacto(int id) {
+    /*public void updateContacto(int id) {
         Intent i = new Intent(this, UpdateContacto.class);
         Contacto contacto = dataBase.queryContacto(id);
         i.putExtra("id", id);
@@ -121,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra("phone", contacto.getMovil());
         i.putExtra("email", contacto.getEmail());
         startActivityForResult(i, CODE_UPDATE);
-    }
+    }*/
 
     public void mostrarContacto(int id) {
         Intent i = new Intent(this, ShowContacto.class);
@@ -131,15 +115,15 @@ public class MainActivity extends AppCompatActivity {
         i.putExtra("address", contacto.getDireccion());
         i.putExtra("phone", contacto.getMovil());
         i.putExtra("email", contacto.getEmail());
-        startActivity(i);
+        startActivityForResult(i, CODE_UPDATE);
     }
 
-    public void callContacto(int id) {
+    /*public void callContacto(int id) {
         Intent i = new Intent(Intent.ACTION_DIAL);
         Contacto contacto = dataBase.queryContacto(id);
         i.setData(Uri.parse("tel:"+contacto.getMovil()));
         startActivity(i);
-    }
+    }*/
 
     protected void onActivityResult(int result, int code, Intent data) {
         if (code == RESULT_OK) {
@@ -155,14 +139,17 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
             } else if (result == CODE_UPDATE) {
                 int id = data.getExtras().getInt("id");
-                String nombre = data.getExtras().getString("Nombre");
-                String direccion = data.getExtras().getString("Direccion");
-                String movil = data.getExtras().getString("Movil");
-                String email = data.getExtras().getString("Email");
-                dataBase.updateContacto(id, nombre, direccion, movil, email);
-                datos.set(pos, new Contacto(id, nombre, direccion, movil, email));
-                adapter.notifyItemChanged(pos);
-                Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+                String nombre = data.getExtras().getString("name");
+                String direccion = data.getExtras().getString("address");
+                String movil = data.getExtras().getString("phone");
+                String email = data.getExtras().getString("email");
+                Contacto contacto = datos.get(pos);
+                if (!contacto.getNombre().equals(nombre) || !contacto.getDireccion().equals(direccion) || !contacto.getMovil().equals(movil) || !contacto.getEmail().equals(email)) {
+                    dataBase.updateContacto(id, nombre, direccion, movil, email);
+                    datos.set(pos, new Contacto(id, nombre, direccion, movil, email));
+                    adapter.notifyItemChanged(pos);
+                    Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -205,7 +192,31 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
+    private void configureAdapter() {
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pos = rvList.getChildAdapterPosition(view);
+                mostrarContacto(idList[pos]);
+            }
+        });
+
+        /*adapter.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                pos = rvList.getChildAdapterPosition(view);
+                openContextMenu(rvList);
+                return true;
+            }
+        });*/
+
+        rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        //rvList.addItemDecoration(new ItemDecorationSeparador(this,ItemDecorationSeparador.VERTICAL_LIST));
+        rvList.setItemAnimator(new DefaultItemAnimator());
+        rvList.setAdapter(adapter);
+    }
+
+   /* @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         if (v.getId() == rvList.getId()) {
@@ -234,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onContextItemSelected(item);
         }
-    }
+    }*/
 
     public void comprobarPermisos(int requestCode) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {

@@ -228,10 +228,10 @@ public class UpdateContacto extends AppCompatActivity {
             if (validate()) {
                 setResult(RESULT_OK, i);
                 i.putExtra("id", id);
-                i.putExtra("Nombre", etNombre.getText().toString());
-                i.putExtra("Direccion", etDireccion.getText().toString());
-                i.putExtra("Movil", etMovil.getText().toString());
-                i.putExtra("Email", etEmail.getText().toString());
+                i.putExtra("name", etNombre.getText().toString());
+                i.putExtra("address", etDireccion.getText().toString());
+                i.putExtra("phone", etMovil.getText().toString());
+                i.putExtra("email", etEmail.getText().toString());
                 finish();
             }
         } else {

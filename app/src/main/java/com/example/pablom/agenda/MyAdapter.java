@@ -2,31 +2,38 @@ package com.example.pablom.agenda;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolder> implements View.OnClickListener, View.OnLongClickListener {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolder> implements View.OnClickListener, ItemTouchAdapter {
 
     private View.OnClickListener listener;
     private View.OnLongClickListener longListener;
     private ArrayList<Contacto> datos;
+    private Database database;
+    public View view;
 
-    public MyAdapter(ArrayList<Contacto> datos) {
+    public MyAdapter(ArrayList<Contacto> datos, Database database) {
         this.datos = datos;
+        this.database = database;
     }
 
     @Override
     public ContactosViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.elementolista, parent,false);
         ContactosViewHolder cvh = new ContactosViewHolder(itemView);
+        view = itemView;
         itemView.setOnClickListener(this);
-        itemView.setOnLongClickListener(this);
+        //itemView.setOnLongClickListener(this);
         return cvh;
     }
 
@@ -52,7 +59,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
         }
     }
 
-    public void setOnLongClickListener(View.OnLongClickListener longListener) {
+    /*public void setOnLongClickListener(View.OnLongClickListener longListener) {
         this.longListener = longListener;
     }
 
@@ -62,6 +69,30 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
             longListener.onLongClick(view);
         }
         return true;
+    }*/
+
+    @Override
+    public void onMoveItem(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                // Collections.swap Intercambia los elementos de posición en datos
+                Collections.swap(datos, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(datos, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onDeleteItem(int position) {
+        int id = datos.get(position).getId();
+        datos.remove(position);
+        notifyItemRemoved(position);
+        database.deleteContacto(id);
+        Toast.makeText(view.getContext(), "Se ha borrado la posición " + position, Toast.LENGTH_SHORT).show();
     }
 
     public static class ContactosViewHolder extends RecyclerView.ViewHolder {
