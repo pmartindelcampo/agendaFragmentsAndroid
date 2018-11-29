@@ -5,7 +5,6 @@
 
     <item
         android:id="@+id/saveChanges"
-        android:title="Guardar cambios"
-
+        android:title="@string/save_changes"
         app:showAsAction="always"/>
 </menu>

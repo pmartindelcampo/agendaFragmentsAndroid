@@ -1,13 +1,9 @@
 package com.example.pablom.agenda;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,6 +79,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
                 Collections.swap(datos, i, i - 1);
             }
         }
+        database.moveContacto(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
@@ -92,7 +89,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContactosViewHolde
         datos.remove(position);
         notifyItemRemoved(position);
         database.deleteContacto(id);
-        Toast.makeText(view.getContext(), "Se ha borrado la posición " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(view.getContext(), R.string.deleteSuccess, Toast.LENGTH_SHORT).show();
     }
 
     public static class ContactosViewHolder extends RecyclerView.ViewHolder {

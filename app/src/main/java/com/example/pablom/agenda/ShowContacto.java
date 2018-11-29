@@ -1,26 +1,20 @@
 package com.example.pablom.agenda;
 
-import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-public class ShowContacto extends AppCompatActivity {
+import com.example.pablom.agenda.FragmentShowContacto.CallContactoListener;
+import com.example.pablom.agenda.FragmentShowContacto.UpdateContactoListener;
 
-    private TextView tvNombre, tvDireccion, tvMovil, tvEmail;
-    private Button butCall, butUpdate;
+public class ShowContacto extends AppCompatActivity implements CallContactoListener, UpdateContactoListener {
+
     private int id;
     Toolbar toolbar;
-    private Database dataBase;
     public static final int CODE_UPDATE = 13;
     String name, address, phone, email;
 
@@ -28,52 +22,34 @@ public class ShowContacto extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_contacto);
-        dataBase = new Database(getApplicationContext());
+
+        FragmentShowContacto frgShowC = (FragmentShowContacto) getSupportFragmentManager().findFragmentById(R.id.frgShowC);
+
+        frgShowC.setCallContactoListener(this);
+        frgShowC.setUpdateContactoListener(this);
 
         Bundle extras = getIntent().getExtras();
-        id = extras.getInt("id");
-        name = extras.getString("name");
-        address = extras.getString("address");
-        phone = extras.getString("phone");
-        email = extras.getString("email");
+        if (extras != null) {
+            id = extras.getInt("id");
+            name = extras.getString("name");
+            address = extras.getString("address");
+            phone = extras.getString("phone");
+            email = extras.getString("email");
 
-        tvNombre = findViewById(R.id.tvNombre);
-        tvDireccion = findViewById(R.id.tvDireccion);
-        tvMovil = findViewById(R.id.tvMovil);
-        tvEmail = findViewById(R.id.tvEmail);
-
-        butCall = (Button) findViewById(R.id.buttonCallContacto);
-        butUpdate = (Button) findViewById(R.id.buttonUpdateContacto);
-
-        tvNombre.setText(name);
-        tvDireccion.setText(address);
-        tvMovil.setText(phone);
-        tvEmail.setText(email);
-
-        butCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                callContacto();
-            }
-        });
-        butUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateContacto();
-            }
-        });
-
-        toolbar = (Toolbar) findViewById(R.id.layout_toolbar);
-        setSupportActionBar(toolbar);
+            toolbar = (Toolbar) findViewById(R.id.layout_toolbar);
+            setSupportActionBar(toolbar);
+        }
     }
 
-    public void callContacto() {
+    @Override
+    public void callButtonClicked(String phone) {
         Intent i = new Intent(Intent.ACTION_DIAL);
-        i.setData(Uri.parse("tel:" + tvMovil.getText().toString()));
+        i.setData(Uri.parse("tel:" + phone));
         startActivity(i);
     }
 
-    public void updateContacto() {
+    @Override
+    public void updateButtonClicked(int id, String name, String address, String phone, String email) {
         Intent i = new Intent(this, UpdateContacto.class);
         i.putExtra("id", id);
         i.putExtra("name", name);
@@ -83,52 +59,46 @@ public class ShowContacto extends AppCompatActivity {
         startActivityForResult(i, CODE_UPDATE);
     }
 
+    @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+       getMenuInflater().inflate(R.menu.toolbar_update, menu);
+       return true;
+   }
+
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+       switch (item.getItemId()) {
+           case R.id.saveChanges:
+               devolverResultado();
+               break;
+       }
+       return true;
+   }
+
     protected void onActivityResult(int result, int code, Intent data) {
         if (code == RESULT_OK) {
+            FragmentShowContacto fsc = (FragmentShowContacto)getSupportFragmentManager().findFragmentById(R.id.frgShowC);
             if (result == CODE_UPDATE) {
-                int id = data.getExtras().getInt("id");
-                String name = data.getExtras().getString("name");
-                String address = data.getExtras().getString("address");
-                String phone = data.getExtras().getString("phone");
-                String email = data.getExtras().getString("email");
+                id = data.getExtras().getInt("id");
+                name = data.getExtras().getString("name");
+                address = data.getExtras().getString("address");
+                phone = data.getExtras().getString("phone");
+                email = data.getExtras().getString("email");
                 //dataBase.updateContacto(id, name, address, phone, email);
-                changeData(name, address, phone, email);
+                fsc.changeData(id, name, address, phone, email);
                 //Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-    private void changeData(String name, String address, String phone, String email) {
-        tvNombre.setText(name);
-        tvDireccion.setText(address);
-        tvMovil.setText(phone);
-        tvEmail.setText(email);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_update, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.saveChanges:
-                devolverResultado();
-                break;
-        }
-        return true;
     }
 
     private void devolverResultado() {
         Intent i = new Intent();
         setResult(RESULT_OK, i);
         i.putExtra("id", id);
-        i.putExtra("name", tvNombre.getText().toString());
-        i.putExtra("address", tvDireccion.getText().toString());
-        i.putExtra("phone", tvMovil.getText().toString());
-        i.putExtra("email", tvEmail.getText().toString());
+        i.putExtra("name", name);
+        i.putExtra("address", address);
+        i.putExtra("phone", phone);
+        i.putExtra("email", email);
         finish();
     }
 }

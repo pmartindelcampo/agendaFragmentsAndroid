@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Agenda</string>
+    <string name="name">Name</string>
+    <string name="inputName">Enter a name</string>
+    <string name="address">Address</string>
+    <string name="inputAddress">Enter an address</string>
+    <string name="mobile">Mobile</string>
+    <string name="inputMobile">Enter a mobile</string>
+    <string name="email">Email</string>
+    <string name="inputEmail">Enter an email</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_button">Add</string>
+    <string name="delete_contact">Delete contact</string>
+    <string name="update_contact">Modify contact</string>
+    <string name="call_contact">Call</string>
+    <string name="error_name">Invalid name</string>
+    <string name="error_email">Invalid email</string>
+    <string name="error_phone">Invalid mobile</string>
+    <string name="error_address">Invalid address</string>
+    <string name="add_success">The contact is saved</string>
+    <string name="update_success">The contact is modified</string>
+    <string name="update_button">Modify</string>
+    <string name="button_call">Call</string>
+    <string name="export_file">Export to file</string>
+    <string name="import_file">Import from file</string>
+    <string name="menu_add">Add contact</string>
+    <string name="details_contact">Contact\'s details</string>
+    <string name="deleteSuccess">The contact is deleted</string>
+    <string name="import_fail">No contact has been imported</string>
+    <string name="import_success">The import has finished</string>
+    <string name="num_imported">Imported contacts:</string>
+    <string name="sd_access_fail">Imposible to access to the SD</string>
+    <string name="permissions_fail">The necessary permissions have not been granted</string>
+    <string name="export_success">The contacts have been exported to SD</string>
+    <string name="export_fail">Error when writing the file to SD</string>
+    <string name="empty_file">The file is empty</string>
+    <string name="read_file_fail">Error when reading the file</string>
+    <string name="save_changes">Save changes</string>
+</resources>

@@ -16,13 +16,24 @@
     <string name="error_name">Nombre no válido</string>
     <string name="error_email">Email no válido</string>
     <string name="error_phone">Móvil no válido</string>
-    <string name="error_address">Direccción no válida</string>
-    <string name="add_success">Se guarda el registro</string>
-    <string name="update_success">Se ha modificado el registro</string>
+    <string name="error_address">Dirección no válida</string>
+    <string name="add_success">Se guarda el contacto</string>
+    <string name="update_success">Se ha modificado el contacto</string>
     <string name="update_button">Modificar</string>
     <string name="button_call">Llamar</string>
     <string name="export_file">Exportar a fichero</string>
     <string name="import_file">Importar desde fichero</string>
     <string name="menu_add">Añadir contacto</string>
     <string name="details_contact">Detalles de contacto</string>
+    <string name="deleteSuccess">Se ha borrado el contacto</string>
+    <string name="import_fail">No se ha importado ningún contacto nuevo</string>
+    <string name="import_success">Se ha completado la importación con éxito</string>
+    <string name="num_imported">Contactos importados:</string>
+    <string name="sd_access_fail">No es posible acceder a la SD</string>
+    <string name="permissions_fail">No se han concedido los permisos necesarios</string>
+    <string name="export_success">Se ha exportado los datos a SD</string>
+    <string name="export_fail">Error al escribir el fichero a SD</string>
+    <string name="empty_file">El fichero está vacío</string>
+    <string name="read_file_fail">Error al leer el fichero</string>
+    <string name="save_changes">Guardar cambios</string>
 </resources>

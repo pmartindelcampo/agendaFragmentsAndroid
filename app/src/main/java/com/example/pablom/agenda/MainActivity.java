@@ -5,151 +5,213 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
+import com.example.pablom.agenda.FragmentCreateContacto.AddContactoListener;
+import com.example.pablom.agenda.FragmentCreateContacto.CancelListener;
+import com.example.pablom.agenda.FragmentList.CreateContactoListener;
+import com.example.pablom.agenda.FragmentList.OnClickItemListener;
+import com.example.pablom.agenda.FragmentShowContacto.CallContactoListener;
+import com.example.pablom.agenda.FragmentUpdateContacto.CancelUpdateListener;
 
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CreateContactoListener, OnClickItemListener, CallContactoListener, FragmentShowContacto.UpdateContactoListener, AddContactoListener, CancelListener, FragmentUpdateContacto.UpdateContactoListener, CancelUpdateListener {
 
     public static final int CODE_ADD = 12;
     public static final int CODE_UPDATE = 13;
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
     private Database dataBase;
-    private MyAdapter adapter;
-    private FloatingActionButton addContacto;
-    private ListView lvList;
-    private RecyclerView rvList;
-    private ArrayList<Contacto> datos;
     private Toolbar toolbar;
-    private int numRows, pos;
-    private int[] idList;
     String permiso;
+    boolean exp;
+
+    FragmentCreateContacto frgCreateC;
+    FragmentShowContacto frgShowC;
+    FragmentUpdateContacto frgUpdateC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dataBase = new Database(getApplicationContext());
-        fillIdList();
+        dataBase = new Database(this);
 
-        rvList = (RecyclerView) findViewById(R.id.rvList);
-        datos = dataBase.queryContactos();
-        adapter = new MyAdapter(datos, dataBase);
-        configureAdapter();
+        FragmentList frgList = (FragmentList)getSupportFragmentManager().findFragmentById(R.id.frgListado);
+        //FragmentShowContacto frgShowC = (FragmentShowContacto)getSupportFragmentManager().findFragmentById(R.id.frgShowC);
+        frgShowC = new FragmentShowContacto();
+        frgCreateC = new FragmentCreateContacto();
+        frgUpdateC = new FragmentUpdateContacto();
 
-        ItemTouchHelper.Callback callback = new SwipeItemTouch((ItemTouchAdapter) adapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(rvList);
+        //El fragmento del listado de contactos siempre va a existir
+        frgList.setCreateContactoListener(this);
+        frgList.setOnClickItemListener(this);
 
-        //lvList = findViewById(android.R.id.list);
-        addContacto = (FloatingActionButton) findViewById(R.id.buttonAddContacto);
-        addContacto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createContacto();
-            }
-        });
+        /*if ((FragmentShowContacto)getSupportFragmentManager().findFragmentById(R.id.frgShowC) != null) {
+            frgShowC.setCallContactoListener(this);
+            frgShowC.setUpdateContactoListener(this);
+        }*/
+
+        //Si la pantalla está en horizontal será visible primero el fragmento para añadir contactos
+        if (findViewById(R.id.frgContainer) != null) {
+            FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+            FT.replace(R.id.frgContainer, frgCreateC);
+            frgCreateC.setAddContactoListener(this);
+            frgCreateC.setCancelListener(this);
+            FT.commit();
+        }
         toolbar = (Toolbar) findViewById(R.id.layout_toolbar);
         setSupportActionBar(toolbar);
-        //registerForContextMenu(rvList);
     }
 
-    public void fillIdList() {
-        numRows = dataBase.numberOfRows();
-        if (numRows > 0) {
-            idList = dataBase.queryIds();
+    @Override
+    public void addButtonClicked() {
+        if (findViewById(R.id.frgContainer) == null) {
+            Intent i = new Intent(this, CreateContacto.class);
+            startActivityForResult(i, CODE_ADD);
+        } else {
+            FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+            FT.replace(R.id.frgContainer, frgCreateC);
+            FT.addToBackStack(null);
+            FT.commit();
+            frgCreateC.setAddContactoListener(this);
+            frgCreateC.setCancelListener(this);
         }
-        //adapter = new MyAdapter(this, dataBase.queryContactosCursor());
-        //setListAdapter(adapter);
-        //lvList.setAdapter(adapter);
     }
 
-    public void createContacto() {
-        Intent i = new Intent(this, CreateContacto.class);
-        startActivityForResult(i, CODE_ADD);
+
+    @Override
+    public void onItemClicked(Contacto c) {
+        if (findViewById(R.id.frgContainer) == null) {
+            Intent i = new Intent(this, ShowContacto.class);
+            i.putExtra("id", c.getId());
+            i.putExtra("name", c.getNombre());
+            i.putExtra("address", c.getDireccion());
+            i.putExtra("phone", c.getMovil());
+            i.putExtra("email", c.getEmail());
+            startActivityForResult(i, CODE_UPDATE);
+        } else if (!frgShowC.isResumed()) {
+            FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+            //Datos que se cargarán al crear la vista del fragmento nuevo
+            Bundle data = new Bundle();
+            data.putInt("id", c.getId());
+            data.putString("name", c.getNombre());
+            data.putString("address", c.getDireccion());
+            data.putString("phone", c.getMovil());
+            data.putString("email", c.getEmail());
+            frgShowC.setArguments(data);
+            FT.replace(R.id.frgContainer, frgShowC);
+            FT.addToBackStack(null);
+            FT.commit();
+            frgShowC.setUpdateContactoListener(this);
+            frgShowC.setCallContactoListener(this);
+        } else {
+            //Si ya es visible el fragmento de mostrar un contacto, solo se cambian los datos del contacto
+            frgShowC.changeData(c.getId(), c.getNombre(), c.getDireccion(), c.getMovil(), c.getEmail());
+        }
     }
 
-    /*public void deleteContacto(int id) {
-        datos.remove(pos);
-        dataBase.deleteContacto(id);
-        adapter.notifyItemRemoved(pos);
-    }*/
 
-    /*public void updateContacto(int id) {
-        Intent i = new Intent(this, UpdateContacto.class);
-        Contacto contacto = dataBase.queryContacto(id);
-        i.putExtra("id", id);
-        i.putExtra("name", contacto.getNombre());
-        i.putExtra("address", contacto.getDireccion());
-        i.putExtra("phone", contacto.getMovil());
-        i.putExtra("email", contacto.getEmail());
-        startActivityForResult(i, CODE_UPDATE);
-    }*/
-
-    public void mostrarContacto(int id) {
-        Intent i = new Intent(this, ShowContacto.class);
-        Contacto contacto = dataBase.queryContacto(id);
-        i.putExtra("id", id);
-        i.putExtra("name", contacto.getNombre());
-        i.putExtra("address", contacto.getDireccion());
-        i.putExtra("phone", contacto.getMovil());
-        i.putExtra("email", contacto.getEmail());
-        startActivityForResult(i, CODE_UPDATE);
-    }
-
-    /*public void callContacto(int id) {
+    @Override
+    public void callButtonClicked(String phone) {
         Intent i = new Intent(Intent.ACTION_DIAL);
-        Contacto contacto = dataBase.queryContacto(id);
-        i.setData(Uri.parse("tel:"+contacto.getMovil()));
+        i.setData(Uri.parse("tel:" + phone));
         startActivity(i);
-    }*/
+    }
 
-    protected void onActivityResult(int result, int code, Intent data) {
+    @Override
+    public void updateButtonClicked(int id, String name, String address, String phone, String email) {
+        FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+        //Datos que se cargarán al crear la vista del fragmento nuevo
+        Bundle data = new Bundle();
+        data.putInt("id", id);
+        data.putString("name", name);
+        data.putString("address", address);
+        data.putString("phone", phone);
+        data.putString("email", email);
+        frgUpdateC.setArguments(data);
+        FT.replace(R.id.frgContainer, frgUpdateC);
+        FT.addToBackStack(null);
+        FT.commit();
+        frgUpdateC.setUpdateContactoListener(this);
+        frgUpdateC.setCancelListener(this);
+    }
+
+    @Override
+    public void acceptAddButtonClicked(String name, String address, String phone, String email) {
+        if (frgCreateC.validate()) {
+            FragmentList fl = (FragmentList)getSupportFragmentManager().findFragmentById(R.id.frgListado);
+            fl.createContacto(name, address, phone, email);
+            Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
+            frgCreateC.clearInputs();
+        }
+
+    }
+
+    @Override
+    public void cancelButtonClicked() {
+        frgCreateC.clearInputs();
+    }
+
+    @Override
+    public void acceptUpdateButtonClicked(int id, String name, String address, String phone, String email) {
+        if (frgUpdateC.validate()) {
+            FragmentList fl = (FragmentList)getSupportFragmentManager().findFragmentById(R.id.frgListado);
+            fl.updateContacto(id, name, address, phone, email);
+            FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+            //Datos que se cargarán al crear la vista del fragmento nuevo
+            Bundle data = new Bundle();
+            data.putInt("id", id);
+            data.putString("name", name);
+            data.putString("address", address);
+            data.putString("phone", phone);
+            data.putString("email", email);
+            FT.replace(R.id.frgContainer, frgShowC);
+            FT.commit();
+            Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void cancelUpdateButtonClicked() {
+        FragmentTransaction FT = getSupportFragmentManager().beginTransaction();
+        FT.replace(R.id.frgContainer, frgShowC);
+        FT.commit();
+    }
+
+    public void onActivityResult(int result, int code, Intent data) {
         if (code == RESULT_OK) {
+            FragmentList fl = (FragmentList)getSupportFragmentManager().findFragmentById(R.id.frgListado);
             if (result == CODE_ADD) {
                 String nombre = data.getExtras().getString("Nombre");
                 String direccion = data.getExtras().getString("Direccion");
                 String movil = data.getExtras().getString("Movil");
                 String email = data.getExtras().getString("Email");
-                dataBase.insertContacto(nombre, direccion, movil, email);
-                datos.add(dataBase.queryLastElement());
-                adapter.notifyItemInserted(datos.size());
-                fillIdList();
+                fl.createContacto(nombre, direccion, movil, email);
                 Toast.makeText(this, R.string.add_success, Toast.LENGTH_SHORT).show();
             } else if (result == CODE_UPDATE) {
+                FragmentShowContacto fsc;
                 int id = data.getExtras().getInt("id");
                 String nombre = data.getExtras().getString("name");
                 String direccion = data.getExtras().getString("address");
                 String movil = data.getExtras().getString("phone");
                 String email = data.getExtras().getString("email");
-                Contacto contacto = datos.get(pos);
-                if (!contacto.getNombre().equals(nombre) || !contacto.getDireccion().equals(direccion) || !contacto.getMovil().equals(movil) || !contacto.getEmail().equals(email)) {
-                    dataBase.updateContacto(id, nombre, direccion, movil, email);
-                    datos.set(pos, new Contacto(id, nombre, direccion, movil, email));
-                    adapter.notifyItemChanged(pos);
-                    Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+                fl.updateContacto(id, nombre, direccion, movil, email);
+                if (getSupportFragmentManager().findFragmentById(R.id.frgShowC) != null) {
+                    fsc =(FragmentShowContacto) getSupportFragmentManager().findFragmentById(R.id.frgShowC);
+                    fsc.changeData(id, nombre, direccion, movil, email);
                 }
+                Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -165,16 +227,17 @@ public class MainActivity extends AppCompatActivity {
         String estado;
         switch(item.getItemId()) {
             case R.id.buttonAddContacto:
-                createContacto();
+                addButtonClicked();
                 break;
 
             case R.id.buttonExport:
                 estado = Environment.getExternalStorageState();
                 permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
                 if (estado.equals(Environment.MEDIA_MOUNTED)) {
+                    exp = true;
                     comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                 } else {
-                    Toast.makeText(this, "No es posible acceder a la SD", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.sd_access_fail, Toast.LENGTH_SHORT).show();
                 }
                 //Toast.makeText(this, "Se ha exportado los datos a la SD", Toast.LENGTH_SHORT).show();
                 break;
@@ -183,120 +246,73 @@ public class MainActivity extends AppCompatActivity {
                 estado = Environment.getExternalStorageState();
                 permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
                 if (estado.equals(Environment.MEDIA_MOUNTED) || estado.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
-                    comprobarPermisos(MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                    exp = false;
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                 } else {
-                    Toast.makeText(this, "No es posible acceder a la SD", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.sd_access_fail, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
         return true;
     }
 
-    private void configureAdapter() {
-        adapter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pos = rvList.getChildAdapterPosition(view);
-                mostrarContacto(idList[pos]);
+    public void expOrImpContacts() {
+        ArrayList<Contacto> contactos;
+        String nombre, direccion, movil, email;
+        int countImp = 0;
+        FragmentList fl = (FragmentList)getSupportFragmentManager().findFragmentById(R.id.frgListado);
+        if (exp) {
+            dataBase.exportToJson(this);
+        } else {
+            contactos = dataBase.importFromJSON(this);
+            for (Contacto c : contactos) {
+                if (!dataBase.existContacto(c)) {
+                    nombre = c.getNombre();
+                    direccion = c.getDireccion();
+                    movil = c.getMovil();
+                    email = c.getEmail();
+                    fl.createContacto(nombre, direccion, movil, email);
+                    countImp++;
+                }
             }
-        });
-
-        /*adapter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                pos = rvList.getChildAdapterPosition(view);
-                openContextMenu(rvList);
-                return true;
+            if (countImp == 0) {
+                Toast.makeText(this, R.string.import_fail, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.num_imported) + countImp, Toast.LENGTH_SHORT).show();
             }
-        });*/
-
-        rvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        //rvList.addItemDecoration(new ItemDecorationSeparador(this,ItemDecorationSeparador.VERTICAL_LIST));
-        rvList.setItemAnimator(new DefaultItemAnimator());
-        rvList.setAdapter(adapter);
-    }
-
-   /* @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == rvList.getId()) {
-            getMenuInflater().inflate(R.menu.contextual_menu, menu);
         }
     }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        int menuItemId = item.getItemId();
-        int id = idList[pos];
-        switch (menuItemId) {
-            case R.id.buttonDelete:
-                deleteContacto(id);
-                return true;
-
-            case R.id.buttonUpdate:
-                updateContacto(id);
-                return true;
-
-            case R.id.buttonCall:
-                callContacto(id);
-                return true;
-
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }*/
 
     public void comprobarPermisos(int requestCode) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, permiso)) {
-
+                    ActivityCompat.requestPermissions(this, new String[]{permiso}, requestCode);
                 } else {
-                    requestPermissions(new String[]{permiso}, requestCode);
+                    ActivityCompat.requestPermissions(this, new String[]{permiso}, requestCode);
                 }
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{permiso}, requestCode);
+                expOrImpContacts();
             }
+        } else {
+            expOrImpContacts();
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        ArrayList<Contacto> contactos = new ArrayList<>();
-        int id;
-        String nombre, direccion, movil, email;
-
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE://Manifest.permission.WRITE_EXTERNAL_STORAGE:{
                 // La peticion ha sido cancelada  si el array esta vacio
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    dataBase.exportToJson(this);
+                    expOrImpContacts();
                 } else {
-                    Toast.makeText(this, "No se han concedido los permisos necesarios", Toast.LENGTH_LONG).show();
-                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                    Toast.makeText(this, R.string.permissions_fail, Toast.LENGTH_LONG).show();
                 }
                 break;
-
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    contactos = dataBase.importFromJSON(this);
-                    for (Contacto c : contactos) {
-                        id = c.getId();
-                        nombre = c.getNombre();
-                        direccion = c.getDireccion();
-                        movil = c.getMovil();
-                        email = c.getEmail();
-                        dataBase.insertContacto(nombre, direccion, movil, email);
-                        datos.add(c);
-                        adapter.notifyItemInserted(datos.size());
-                    }
-                } else {
-                    Toast.makeText(this, "No se han concedido los permisos necesarios", Toast.LENGTH_LONG).show();
-                    comprobarPermisos(MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
         }
     }
+
 }

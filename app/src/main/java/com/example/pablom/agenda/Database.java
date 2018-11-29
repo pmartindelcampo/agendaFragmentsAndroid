@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
@@ -88,7 +87,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"_id", "nombre", "direccion", "movil", "email"};
         Cursor c = db.query("contactos", valores_recuperar, "_id=" + id, null, null, null, null, null);
-        if (c != null) {
+        if (c.getCount() > 0) {
             c.moveToFirst();
         } else {
             return null;
@@ -103,8 +102,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         String[] valores_recuperar = {"_id","nombre", "direccion", "movil", "email"};
 
-        Cursor c = db.query("contactos", valores_recuperar, null, null, null, null, null, null);
-        return c;
+        return db.query("contactos", valores_recuperar, null, null, null, null, null, null);
     }
 
     public ArrayList<Contacto> queryContactos() {
@@ -112,18 +110,25 @@ public class Database extends SQLiteOpenHelper {
 
         Cursor c = queryContactosCursor();
 
-        int i;
         if (c.getCount() > 0) {
-            i = 0;
             c.moveToFirst();
             while (!c.isAfterLast()) {
                 datosContactos.add(new Contacto(c.getInt(0), c.getString(1), c.getString(2), c.getString(3), c.getString(4)));
-                i++;
                 c.moveToNext();
             }
         }
         c.close();
         return datosContactos;
+    }
+
+    public boolean existContacto(Contacto c) {
+        ArrayList<Contacto> contactos = queryContactos();
+        for (Contacto contacto : contactos) {
+            if (c.getNombre().equals(contacto.getNombre()) && c.getDireccion().equals(contacto.getDireccion()) && c.getMovil().equals(contacto.getMovil()) && c.getEmail().equals(contacto.getEmail())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Contacto queryLastElement() {
@@ -136,8 +141,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public int numberOfRows(){
-        int dato= (int) DatabaseUtils.queryNumEntries(this.getWritableDatabase(), "contactos");
-        return dato;
+        return (int) DatabaseUtils.queryNumEntries(this.getWritableDatabase(), "contactos");
     }
 
     public int [] queryIds(){
@@ -158,6 +162,24 @@ public class Database extends SQLiteOpenHelper {
         else datosId= new int [0];
         cursor.close();
         return datosId;
+    }
+
+    public void moveContacto(int fromPosition, int toPosition) {
+        ArrayList<Contacto> contactos = queryContactos();
+        Contacto contactoAux = contactos.get(fromPosition);
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Contacto contactoSig = contactos.get(i + 1);
+                this.updateContacto(contactoAux.getId(), contactoSig.getNombre(), contactoSig.getDireccion(), contactoSig.getMovil(), contactoSig.getEmail());
+                this.updateContacto(contactoSig.getId(), contactoAux.getNombre(), contactoAux.getDireccion(), contactoAux.getMovil(), contactoAux.getEmail());
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Contacto contactoAnt = contactos.get(i - 1);
+                this.updateContacto(contactoAux.getId(), contactoAnt.getNombre(), contactoAnt.getDireccion(), contactoAnt.getMovil(), contactoAnt.getEmail());
+                this.updateContacto(contactoAnt.getId(), contactoAux.getNombre(), contactoAux.getDireccion(), contactoAux.getMovil(), contactoAux.getEmail());
+            }
+        }
     }
 
     public void exportToJson(Context context) {
@@ -193,9 +215,10 @@ public class Database extends SQLiteOpenHelper {
             OutputStreamWriter fWrite = new OutputStreamWriter(new FileOutputStream(f));
             fWrite.write(json.toString());
             fWrite.close();
-            Toast.makeText(context, "Se ha exportado los datos a SD", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.export_success, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Log.e("Ficheros", "Error al escribir fichero a SD");
+            Toast.makeText(context, R.string.export_fail, Toast.LENGTH_SHORT).show();
+            Log.e("Ficheros", e.getMessage());
         }
     }
 
@@ -208,16 +231,18 @@ public class Database extends SQLiteOpenHelper {
             BufferedReader fRead = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
             String jsonString = fRead.readLine();
             json = new JSONArray(jsonString);
-            if (json != null) {
+            if (json.length() > 0) {
                 for (int i = 0; i < json.length(); i++) {
-                    contactos.add((Contacto) json.get(i));
+                    JSONObject jsonObject = json.getJSONObject(i);
+                    Contacto contactoAdd = new Contacto(jsonObject.getInt("_id"), jsonObject.getString("nombre"), jsonObject.getString("direccion"), jsonObject.getString("movil"), jsonObject.getString("email"));
+                    contactos.add(contactoAdd);
                 }
-                Toast.makeText(context, "Se ha completado la importación con éxito", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "El fichero está vacío", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.empty_file, Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Log.e("Ficheros", "Error al leer el fichero");
+            Toast.makeText(context, R.string.read_file_fail, Toast.LENGTH_SHORT).show();
+            Log.e("Ficheros", e.getMessage());
         }
         return contactos;
     }
