@@ -23,6 +23,7 @@
             android:background="?attr/colorPrimary"
             theme="@style/ToolbarIconColor"
             android:elevation="4dp"
+            app:title="@string/app_name"
             android:layout_alignParentTop="true"
             android:theme="@style/Theme.Design.Light.NoActionBar"
             app:popupTheme="@style/Theme.Design.Light.NoActionBar" >

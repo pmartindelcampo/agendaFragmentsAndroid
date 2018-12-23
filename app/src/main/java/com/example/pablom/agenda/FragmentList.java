@@ -1,15 +1,28 @@
 package com.example.pablom.agenda;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,6 +36,11 @@ public class FragmentList extends Fragment {
     private int pos;
     private int[] idList;
 
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    String permiso;
+    boolean exp;
+
+    private Toolbar toolbar;
     private CreateContactoListener listenerCreate;
     private OnClickItemListener listenerClickItem;
 
@@ -60,6 +78,14 @@ public class FragmentList extends Fragment {
         //toolbar = (Toolbar) getActivity().findViewById(R.id.layout_toolbar);
         //((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         //registerForContextMenu(rvList);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.layout_toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     public void fillIdList() {
@@ -176,6 +202,106 @@ public class FragmentList extends Fragment {
         rvList.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         rvList.setItemAnimator(new DefaultItemAnimator());
         rvList.setAdapter(adapter);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String estado;
+        switch(item.getItemId()) {
+            case R.id.buttonAddContacto:
+                if (listenerCreate != null) {
+                    listenerCreate.addButtonClicked();
+                }
+                break;
+
+            case R.id.buttonExport:
+                estado = Environment.getExternalStorageState();
+                permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+                if (estado.equals(Environment.MEDIA_MOUNTED)) {
+                    exp = true;
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                } else {
+                    Toast.makeText(getActivity(), R.string.sd_access_fail, Toast.LENGTH_SHORT).show();
+                }
+                //Toast.makeText(this, "Se ha exportado los datos a la SD", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.buttonImport:
+                estado = Environment.getExternalStorageState();
+                permiso = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+                if (estado.equals(Environment.MEDIA_MOUNTED) || estado.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
+                    exp = false;
+                    comprobarPermisos(MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                } else {
+                    Toast.makeText(getActivity(), R.string.sd_access_fail, Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+        return true;
+    }
+
+    public void expOrImpContacts() {
+        ArrayList<Contacto> contactos;
+        String nombre, direccion, movil, email;
+        int countImp = 0;
+        if (exp) {
+            dataBase.exportToJson(getActivity());
+        } else {
+            contactos = dataBase.importFromJSON(getActivity());
+            for (Contacto c : contactos) {
+                if (!dataBase.existContacto(c)) {
+                    nombre = c.getNombre();
+                    direccion = c.getDireccion();
+                    movil = c.getMovil();
+                    email = c.getEmail();
+                    createContacto(nombre, direccion, movil, email);
+                    countImp++;
+                }
+            }
+            if (countImp == 0) {
+                Toast.makeText(getActivity(), R.string.import_fail, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), getString(R.string.num_imported) + countImp, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void comprobarPermisos(int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getActivity(), permiso) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), permiso)) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{permiso}, requestCode);
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{permiso}, requestCode);
+                }
+            } else {
+                expOrImpContacts();
+            }
+        } else {
+            expOrImpContacts();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE://Manifest.permission.WRITE_EXTERNAL_STORAGE:{
+                // La peticion ha sido cancelada  si el array esta vacio
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    expOrImpContacts();
+                } else {
+                    Toast.makeText(getActivity(), R.string.permissions_fail, Toast.LENGTH_LONG).show();
+                }
+                break;
+        }
     }
 
    /* @Override

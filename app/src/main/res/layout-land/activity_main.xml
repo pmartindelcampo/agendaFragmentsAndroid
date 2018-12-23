@@ -5,9 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        class="com.example.pablom.agenda.FragmentList"
-        android:id="@+id/frgListado"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/frgVContainer"
         android:layout_weight="60"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

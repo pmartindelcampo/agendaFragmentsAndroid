@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ShowContacto">
+    tools:context=".MainActivity">
 
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/layout_toolbar"
+        android:id="@+id/layout_toolbar_save"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_height="wrap_content"

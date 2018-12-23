@@ -2,8 +2,12 @@ package com.example.pablom.agenda;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -69,6 +73,12 @@ public class FragmentShowContacto extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
         //setContentView(R.layout.activity_show_contacto);
@@ -87,9 +97,7 @@ public class FragmentShowContacto extends Fragment {
             tvMovil.setText(phone);
             tvEmail.setText(email);
         }
-
     }
-
 
     public void changeData(final int id, final String name, final String address, final String phone, final String email) {
         tvNombre.setText(name);
